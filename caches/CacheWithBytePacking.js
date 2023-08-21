@@ -6,6 +6,8 @@ const {
   unpack
 } = require("../helpers");
 
+/* @CHECK: https://blog.shalvah.me/posts/packing-and-unpacking-bytes */
+
 /* @NOTE: This base class implements the Decorator coding pattern for byte-packed cache */
 
 /* @HINT: This is the cache (with byte-packing) base/parent class. */
