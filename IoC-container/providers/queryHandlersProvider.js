@@ -1,0 +1,23 @@
+const PostgreSQLDatabaseQueryTaskHandler = require("../../query-handlers/PostgreSQLDatabaseQueryTaskHandler");
+const GraphQLServiceQueryTaskHandler = require("../../query-handlers/GraphQLServiceQueryTaskHandler");
+const RESTServiceQueryTaskHandler = require("../../query-handlers/RESTServiceQueryTaskHandler");
+const RedisCacheQueryTaskHandler = require("../../query-handlers/RedisCacheQueryTaskHandler");
+
+module.exports = function (c) {
+  c.service(
+    "PostgreSQLDatabaseQueryTaskHandler",
+    (c) => new PostgreSQLDatabaseQueryTaskHandler(c.Database)
+  );
+  c.service(
+    "RedisCacheQueryTaskHandler",
+    (c) => new RedisCacheQueryTaskHandler(c.EncryptedCache)
+  );
+  c.service(
+    "GraphQLServiceQueryTaskHandler",
+    () => new GraphQLServiceQueryTaskHandler({})
+  );
+  c.service(
+    "RESTServiceQueryTaskHandler",
+    () => new RESTServiceQueryTaskHandler({})
+  );
+};
