@@ -2,7 +2,9 @@ const cache = {};
 
 const accessEnv = (key, defaultValue) => {
   if (!(key in process.env)) {
-    if (defaultValue) return defaultValue;
+    if (defaultValue) {
+      return defaultValue;
+    }
     throw new Error(`${key} not found in process.env!`);
   }
 
@@ -10,7 +12,7 @@ const accessEnv = (key, defaultValue) => {
 
   cache[key] = process.env[key];
 
-  return process.env[key];
+  return process.env[key] || ddefaultValue;
 };
 
 module.exports = accessEnv;
