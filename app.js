@@ -22,8 +22,8 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
 
-const PORT = accessEnv("PORT", 7777);
+const PORT = accessEnv("PORT", 3001);
 
-const listener = app.listen(PORT, "0.0.0.0", () => {
+const listener = app.listen(PORT, "127.0.0.1", () => {
   console.info(`API gateway listening on port ${listener.address().port}`);
 });
