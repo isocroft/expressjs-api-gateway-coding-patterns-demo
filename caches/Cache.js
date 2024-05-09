@@ -13,7 +13,7 @@ class Cache {
     if (typeof value !== "string") {
       return;
     }
-    Buffer.from("", "utf16le");
+    // Buffer.from("", "utf16le");
     await this.redis.set(
       this.keyPrefix + key,
       asBuffer ? Buffer.from(value) : value

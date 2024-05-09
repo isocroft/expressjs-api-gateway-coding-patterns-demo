@@ -5,9 +5,9 @@ module.exports = (function () {
 
   require("./providers/cacheProvider")(container);
   require("./providers/databaseProvider")(container);
+  require("./providers/httpProvider")(container);
   require("./providers/queryHandlersProvider")(container);
   require("./providers/repositoriesProvider")(container);
-  require("./providers/httpProvider")(container);
 
   return container;
 })();

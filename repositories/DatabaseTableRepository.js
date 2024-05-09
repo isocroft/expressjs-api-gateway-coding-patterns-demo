@@ -7,7 +7,7 @@ const { isEmpty } = require("../helpers");
 class DatabaseTableRepository {
   constructor(queryHandlers = []) {
     /* @NOTE: <COMPOSITION> | Composition can also lead to tight coupling! */
-    /* @NOTE: Tight coupling here: will allow temporarily */
+    /* @NOTE: Tight coupling (and tight cohesion) here: will allow temporarily */
     this.queryManager = new StorageQueryHandlersManager(queryHandlers);
   }
 

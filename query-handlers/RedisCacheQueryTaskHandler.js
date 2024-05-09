@@ -28,8 +28,10 @@ class RedisCacheQueryTaskHandler extends StorageQueryTaskHandler {
       const query = builderOrRequest.toSQL();
       canProceedWithProcessing = query.sql.toLowerCase().startsWith("select");
     } else {
-      canProceedWithProcessing =
-        builderOrRequest.contentType === "application/graphql";
+      canProceedWithProcessing = !(builderOrRequest.headers instanceof Object
+        && builderOrRequest.headers['content-type'] === "application/graphql")
+        || (typeof builderOrRequest.url === "string"
+            && builderOrRequest.url.endsWith("/graphql"));
     }
 
     await this.cache.establishConnectionWithRedisServer({
@@ -57,8 +59,10 @@ class RedisCacheQueryTaskHandler extends StorageQueryTaskHandler {
       const query = builderOrRequest.toSQL();
       canProceedWithProcessing = query.sql.toLowerCase().startsWith("select");
     } else {
-      canProceedWithProcessing =
-        builderOrRequest.contentType === "application/graphql";
+      canProceedWithProcessing = !(builderOrRequest.headers instanceof Object
+        && builderOrRequest.headers['content-type'] === "application/graphql")
+        || (typeof builderOrRequest.url === "string"
+            && builderOrRequest.url.endsWith("/graphql"));
     }
 
     if (canProceedWithProcessing) {

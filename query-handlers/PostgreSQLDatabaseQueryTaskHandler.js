@@ -14,9 +14,9 @@ const StorageQueryTaskHandler = require("./StorageQueryTaskHandler");
 */
 
 class PostgreSQLDatabaseQueryTaskHandler extends StorageQueryTaskHandler {
-  constructor(databaseContainer) {
+  constructor(databaseClient) {
     super("database handler execution declined");
-    this.database = databaseContainer;
+    this.database = databaseClient;
     this.databaseConnection = null;
   }
 
@@ -24,36 +24,40 @@ class PostgreSQLDatabaseQueryTaskHandler extends StorageQueryTaskHandler {
     let canProceedWithProcessing = false;
 
     /* @HINT: Check if variable `builderOrRequest` is a knex query builder instance */
-    if (typeof builderOrRequest.toSQL === "function") {
+    if (builderOrRequest instanceof Object && typeof builderOrRequest.toSQL === "function") {
       canProceedWithProcessing = true;
     }
 
-    if (canProceedWithProcessing) {
-      this.databaseConnection = await this.database.client.acquireConnection();
-      this.databaseConnection.query('SET timezone="UTC";');
-
-      /* @HINT: Setup a database query timeout */
-      builderOrRequest.timeout(5500, {
-        cancel: true
-      });
-
-      /* @HINT: database query result initialization */
-      let queryResult = null;
-
-      /* @HINT: Setup database transaction for database query */
-      await this.database.transaction(async (transaction) => {
-        /* @CHECK: https://github.com/knex/knex/issues/3018#issuecomment-458781094/ */
-        queryResult = await builderOrRequest.transacting(transaction);
-      });
-
-      return queryResult;
+    if (!canProceedWithProcessing) {
+      return this.skipHandlerProcessing();
     }
 
-    this.skipHandlerProcessing();
+    this.databaseConnection = await this.database.client.acquireConnection();
+    this.databaseConnection.query('SET timezone="UTC";');
+
+    /* @HINT: Setup a database query timeout */
+    builderOrRequest.timeout(5500, {
+      cancel: true
+    });
+
+    /* @HINT: database query result initialization */
+    let queryResult = null;
+
+    /* @HINT: Setup database transaction for database query */
+    await this.database.transaction(async (transaction) => {
+      /* @CHECK: https://github.com/knex/knex/issues/3018#issuecomment-458781094/ */
+      queryResult = await builderOrRequest.transacting(transaction);
+    });
+
+    return queryResult;
   }
 
   async finalizeProcessing() {
     await this.database.client.releaseConnection(this.databaseConnection);
+  }
+
+  async finalizeProcessingWithError() {
+    console.error("e don finish postgre sql database query with error ooo");
   }
 }
 

@@ -10,13 +10,13 @@ class HttpServiceRepository {
     this.queryManager = new StorageQueryHandlersManager(queryHandlers);
   }
 
-  get httpRequest() {
-    throw new Error("http request object is not available from abstract class");
-  }
-
   set newRootHandler(rootHandler) {
     this.queryManager.swapRootHandler(rootHandler);
   }
+
+  get apiVersion () {
+    throw new Error("api version not set")
+  } 
 
   baseURL() {
     throw new Error("base URL string is not available from abstract class");
@@ -31,18 +31,39 @@ class HttpServiceRepository {
     return {
       url: this.baseURL(pathName),
       method: httpMethod,
-      [httpMethod === "GET" ? "query" : "body"]: requestParams,
+      [httpMethod === "GET" || httpMethod === "HEAD" ? "query" : "body"]: requestParams,
       headers
     };
   }
 
-  async postRequest(headers, pathName, bodyParams) {
-    const httpRequest = this.httpRequest;
-    httpRequest.$config = this.requestConfig(
+  async postRequest({ headers = {}, pathName = "/", requestParams = {} }) {
+    const httpRequest = this.requestConfig(
       pathName,
       "POST",
       headers,
-      bodyParams
+      requestParams
+    );
+
+    return await this.queryManager.execute(httpRequest);
+  }
+
+  async getRequest({ headers = {}, pathName = "/", requestParams = {} }) {
+    const httpRequest = this.requestConfig(
+      pathName,
+      "GET",
+      headers,
+      requestParams
+    );
+
+    return await this.queryManager.execute(httpRequest);
+  }
+
+  async putRequest({ headers = {}, pathName = "/", requestParams = {} }) {
+    const httpRequest = this.requestConfig(
+      pathName,
+      "PUT",
+      headers,
+      requestParams
     );
 
     return await this.queryManager.execute(httpRequest);

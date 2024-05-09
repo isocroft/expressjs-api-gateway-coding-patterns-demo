@@ -9,7 +9,7 @@ module.exports = function (c) {
   c.service("RedisCache", () => redis);
   c.service(
     "Cache",
-    (c) => new Cache(c.RedisCache, accessEnv("REDIS_KEY_PREFIX", ""))
+    (c) => new Cache(redis, accessEnv("REDIS_KEY_PREFIX", ""))
   );
   c.service("BytePackedCache", (c) => new CacheWithBytePacking(c.Cache));
   c.service(

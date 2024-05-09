@@ -124,6 +124,7 @@ const isEmpty = (objectValue) => {
 };
 
 /**
+ * @class 
  * @see https://medium.com/@vincentcorbee/utf-16-to-utf-8-in-javascript-18b4b11b6e1e
  */
 
@@ -186,6 +187,7 @@ class StringReader {
 }
 
 /**
+ * @callback isLeadingSurrogate
  * @see https://medium.com/@vincentcorbee/utf-16-to-utf-8-in-javascript-18b4b11b6e1e
  */
 
@@ -193,10 +195,19 @@ const isLeadingSurrogate = (charCode) => {
   return charCode >= 0xd800 && charCode <= 0xdbff;
 };
 
+/**
+ * @callback isTrailingSurrogate
+ * @see https://medium.com/@vincentcorbee/utf-16-to-utf-8-in-javascript-18b4b11b6e1e
+ */
 const isTrailingSurrogate = (charCode) => {
   return charCode >= 0xdc00 && charCode <= 0xdfff;
 };
 
+
+/**
+ * @class StringEncoder
+ * @see https://medium.com/@vincentcorbee/utf-16-to-utf-8-in-javascript-18b4b11b6e1e
+ */
 class StringEncoder {
   static UTF16SurrogatePairToCodePoint(leading, trailing) {
     return (leading - 0xd800) * 0x400 + (trailing - 0xdc00) + 0x10000;
@@ -264,6 +275,7 @@ class StringEncoder {
 }
 
 /**
+ * @class StringDecoder
  * @see https://medium.com/@vincentcorbee/utf-16-to-utf-8-in-javascript-18b4b11b6e1e
  */
 
@@ -320,7 +332,7 @@ class StringDecoder {
  */
 const convertBytesArrayToBinaryString = (bytesArray) => {
   const typedArrayUTF8 = bytesArray;
-  StringDecoder.UTF8ToString(typedArrayUTF8);
+  return StringDecoder.UTF8ToString(typedArrayUTF8);
 };
 
 /**

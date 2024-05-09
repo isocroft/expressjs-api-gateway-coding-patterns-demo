@@ -7,11 +7,14 @@
     "start": "nodemon app.js localhost 8080"
   },
   "dependencies": {
+    "aws4": "1.12.0",
+    "aws-sdk": "2.1617.0",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "dotenv": "8.2.0",
     "express": "~4.16.1",
-    "knex": "2.4.2",
+    "got": "8.3.2",
+    "knex": "0.21.1",
     "morgan": "~1.9.1",
     "pg": "8.10.0",
     "redis": "4.6.5"

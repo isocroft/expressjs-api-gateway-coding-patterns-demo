@@ -8,10 +8,14 @@ module.exports = function (c) {
       new UserDataRepository([
         c.RedisCacheQueryTaskHandler,
         c.PostgreSQLDatabaseQueryTaskHandler
-      ])
+      ], c.Database)
   );
   c.service(
     "GitHubAPIRepository",
-    (c) => new GitHubAPIRepository([c.RESTServiceQueryTaskHandler])
+    (c) => new GitHubAPIRepository([
+      c.RESTServiceQueryTaskHandler,
+      /* @HINT: Redundancy, in case GitHub REST API is down, use the GraphQL API instead */
+      c.GraphQLServiceQueryTaskHandler
+    ])
   );
 };

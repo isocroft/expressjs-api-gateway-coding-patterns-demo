@@ -50,8 +50,20 @@ class StorageQueryTaskHandler {
     );
   }
 
+  async finalizeProcessingWithError() {
+    throw new Error(
+      "Implementation needed for [protected] [abstract] method {async} `finalizeProcessingWithError()`. \r\n\r\n" +
+        " > This interface is not available from abstract class."
+    );
+  }
+
+  migrateContext (builderOrRequest) {
+    return builderOrRequest;
+  }
+
   async handle(builderOrRequest) {
     let result = null;
+    let processingError = null;
     let hasError = false;
 
     try {
@@ -60,10 +72,13 @@ class StorageQueryTaskHandler {
       if (error instanceof Error) {
         if (error.message === this.message) {
           if (this.nextHandler !== null) {
-            result = await this.nextHandler.handle(builderOrRequest);
+            result = await this.nextHandler.handle(
+              this.nextHandler.migrateContext(builderOrRequest)
+            );
           }
         } else {
           hasError = true;
+          processingError = error;
           throw error;
         }
       }
@@ -71,6 +86,8 @@ class StorageQueryTaskHandler {
     } finally {
       if (!hasError) {
         await this.finalizeProcessing(builderOrRequest, result);
+      } else {
+        await this.finalizeProcessingWithError(builderOrRequest, processingError)
       }
     }
   }

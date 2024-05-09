@@ -10,33 +10,37 @@ class StorageQueryHandlersManager {
     }
 
     for (let count = 0; count + 1 < totalCount && totalCount > count; count++) {
-      const previousQueryHandler = storageQueryHandlers[count];
-      const nextQueryHandler = storageQueryHandlers[count + 1];
+      const previousQueryTaskHandler = storageQueryHandlers[count];
+      const nextQueryTaskHandler = storageQueryHandlers[count + 1];
 
-      previousQueryHandler.setNextHandler(nextQueryHandler);
+      if (previousQueryTaskHandler instanceof StorageQueryTaskHandler
+        && nextQueryTaskHandler instanceof StorageQueryTaskHandler) {
+        previousQueryTaskHandler.setNextHandler(nextQueryTaskHandler);
+      }
     }
 
-    const [rootHandler] = storageQueryHandlers;
+    const [rootTaskHandler] = storageQueryHandlers;
 
-    this.rootHandler = rootHandler;
+    this.rootTaskHandler = rootTaskHandler;
   }
 
   async execute(queryObject) {
-    return await this.rootHandler.handle(queryObject);
+    return await this.rootTaskHandler.handle(queryObject);
   }
 
-  swapRootHandler(newRootHandler) {
-    if (!(newRootHandler instanceof StorageQueryTaskHandler)) {
+  swapRootHandler(newRootTaskHandler) {
+    if (!(newRootTaskHandler instanceof StorageQueryTaskHandler)) {
       console.error(
         "Cannot proceed: root handler not swapable as object provided isn't a handler"
       );
       return false;
     }
 
-    const formerRootHandler = this.rootHandler;
+    const formerRootTaskHandler = this.rootTaskHandler;
 
-    this.rootHandler = newRootHandler;
-    this.rootHandler.setNextHandler(formerRootHandler);
+    this.rootTaskHandler = newRootTaskHandler;
+    this.rootTaskHandler.setNextHandler(formerRootTaskHandler);
+
     return true;
   }
 }
