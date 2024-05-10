@@ -1,8 +1,13 @@
 const accessEnv = require("../../accessEnv");
+
+const gotQl = require('gotql')
 const got = require("got");
+
 const url = require('url');
 const AWS = require('aws-sdk');
 const AWS4 = require('aws4');
+
+const { isEmpty } = require("../../helpers");
 
 const awsConfig = new AWS.Config({
   accessKeyId: accessEnv("AWS_SDK_ACCESS_ID", 'ACC_ID'),
@@ -25,15 +30,30 @@ const awsSdkOptions = {
   json: true
 };
 
+/* @NOTE: <INDIRECTION> | We are wrapping and exposing a similar contract to the logic being wrapped for consumption */
+
+/* @NOTE: This function implements the Adapter coding pattern for data query tasks */
+
 const awsClient = (uri, options) => {
+  let requestPayload = {}
   /* @HINT: We need to parse the URL before passing it to `got` so `aws4` can sign the request */
-  const requestPayload = Object.assign(
-    typeof url['parse'] === "function"
-      ? url.parse(uri)
-      : new url.URL(uri),
-      awsSdkOptions,
-      options
-    );
+  if (typeof uri === "string") {
+    requestPayload = Object.assign(
+      typeof url['parse'] === "function"
+        ? url.parse(uri)
+        : new url.URL(uri),
+        awsSdkOptions,
+        options || {}
+      );
+  } else {
+    if (uri instanceof Object) {
+      requestPayload = uri
+    }
+  }
+
+  if (isEmpty(requestPayload)) {
+    throw new Error("")
+  }
 
   AWS4.sign(
     requestPayload,
@@ -46,5 +66,5 @@ const awsClient = (uri, options) => {
 module.exports = function (c) {
   c.service("AWSHttpClient", () => awsClient);
   c.service("RestClient", () => got);
-  c.service("GraphQLClient", () => got)
+  c.service("GraphQLClient", () => gotQl)
 };

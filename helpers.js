@@ -105,7 +105,20 @@ const unpack = (utf16EncodedString) => {
 
 /**
  *
- * @param {Mixed} objectValue
+ * @param {String} text
+ * @param {String} delimeter
+ *
+ * @returns {String}
+ */
+const camelCaseify = (text) => {
+  return text.replace(/\W+(.)/g, function(_, chr) {
+    return chr.toUpperCase();
+  });
+};
+
+/**
+ *
+ * @param {*} objectValue
  *
  * @returns {Boolean}
  */
@@ -536,6 +549,7 @@ const murmurHash = (data) => {
 module.exports = {
   encryptData,
   decryptData,
+  camelCaseify,
   pack,
   unpack,
   isEmpty,

@@ -16,6 +16,6 @@ module.exports = function (c) {
       c.RESTServiceQueryTaskHandler,
       /* @HINT: Redundancy, in case GitHub REST API is down, use the GraphQL API instead */
       c.GraphQLServiceQueryTaskHandler
-    ])
+    ], c.LRUCache)
   );
 };

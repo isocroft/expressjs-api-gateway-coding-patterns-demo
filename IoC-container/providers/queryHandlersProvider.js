@@ -3,8 +3,6 @@ const GraphQLServiceQueryTaskHandler = require("../../query-handlers/GraphQLServ
 const RESTServiceQueryTaskHandler = require("../../query-handlers/RESTServiceQueryTaskHandler");
 const RedisCacheQueryTaskHandler = require("../../query-handlers/RedisCacheQueryTaskHandler");
 
-const pg = require("pg")
-
 module.exports = function (c) {
   c.service(
     "PostgreSQLDatabaseQueryTaskHandler",

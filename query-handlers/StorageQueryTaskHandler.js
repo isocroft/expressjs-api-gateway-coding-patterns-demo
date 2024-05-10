@@ -3,16 +3,22 @@
 /* @NOTE: This base class implements the Chain-Of-Responsibility coding pattern for data query tasks */
 
 /* @NOTE:
-    In a language like PHP or Java, this class will be an abstract class with 2 protected and abstract methods:
+    In a language like PHP or Java, this class will be an abstract class with 3 protected and abstract methods:
 
     - beginProcessing(...);
-    - finalizaProcessing(...);
+    - finalizeProcessing(...);
+    - finalizeProcessingWithError(...);
 
-    This abstract class will also have 3 public and final methods:
+    This abstract class will also have 4 public and final methods:
 
     - setNextHandler(...);
     - skipHandlerProcessing();
+    - skipHandlerProcessingWithCustomMessage(...);
     - handle(...);
+
+    This abstract class will have 1 protected method
+
+    - migrateContext(...);
 */
 
 /* @HINT: This is the query task handler base/parent class. */
@@ -43,6 +49,10 @@ class StorageQueryTaskHandler {
     throw new Error(this.message);
   }
 
+  skipHandlerProcessingWithCustomMessage (message) {
+    throw new Error(message);
+  }
+
   async finalizeProcessing() {
     throw new Error(
       "Implementation needed for [protected] [abstract] method {async} `finalizeProcessing()`. \r\n\r\n" +
@@ -68,6 +78,7 @@ class StorageQueryTaskHandler {
 
     try {
       result = await this.beginProcessing(builderOrRequest);
+      return result;
     } catch (error) {
       if (error instanceof Error) {
         if (error.message === this.message) {
@@ -82,7 +93,6 @@ class StorageQueryTaskHandler {
           throw error;
         }
       }
-      return result;
     } finally {
       if (!hasError) {
         await this.finalizeProcessing(builderOrRequest, result);

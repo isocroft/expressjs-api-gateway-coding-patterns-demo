@@ -38,16 +38,16 @@ class RedisCacheQueryTaskHandler extends StorageQueryTaskHandler {
       timeoutInMilliSeconds: 1200
     });
 
-    if (canProceedWithProcessing) {
-      const queryHash = murmurHash(builderOrRequest.toSQL().sql);
-      const isCacheHit = await this.canQuery(queryHash);
-
-      if (isCacheHit) {
-        return await this.cache.get(queryHash);
-      }
+    if (!canProceedWithProcessing) {
+      return this.skipHandlerProcessing();
     }
 
-    this.skipHandlerProcessing();
+    const queryHash = murmurHash(builderOrRequest.toSQL().sql);
+    const isCacheHit = await this.canQuery(queryHash);
+
+    if (isCacheHit) {
+      return await this.cache.get(queryHash);
+    }
   }
 
   async finalizeProcessing(builderOrRequest, result) {

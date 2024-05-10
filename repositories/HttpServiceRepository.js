@@ -16,7 +16,7 @@ class HttpServiceRepository {
 
   get apiVersion () {
     throw new Error("api version not set")
-  } 
+  }
 
   baseURL() {
     throw new Error("base URL string is not available from abstract class");
@@ -32,11 +32,13 @@ class HttpServiceRepository {
       url: this.baseURL(pathName),
       method: httpMethod,
       [httpMethod === "GET" || httpMethod === "HEAD" ? "query" : "body"]: requestParams,
-      headers
+      headers,
+      json: headers['content-type'].includes('json'),
+      form: headers['content-type'].includes('form-data')
     };
   }
 
-  async postRequest({ headers = {}, pathName = "/", requestParams = {} }) {
+  async httpPostRequest({ headers = {}, pathName = "/", requestParams = {} }) {
     const httpRequest = this.requestConfig(
       pathName,
       "POST",
@@ -44,10 +46,10 @@ class HttpServiceRepository {
       requestParams
     );
 
-    return await this.queryManager.execute(httpRequest);
+    return this.queryManager.execute(httpRequest);
   }
 
-  async getRequest({ headers = {}, pathName = "/", requestParams = {} }) {
+  async httpGetRequest({ headers = {}, pathName = "/", requestParams = {} }) {
     const httpRequest = this.requestConfig(
       pathName,
       "GET",
@@ -55,10 +57,10 @@ class HttpServiceRepository {
       requestParams
     );
 
-    return await this.queryManager.execute(httpRequest);
+    return this.queryManager.execute(httpRequest);
   }
 
-  async putRequest({ headers = {}, pathName = "/", requestParams = {} }) {
+  async httpPutRequest({ headers = {}, pathName = "/", requestParams = {} }) {
     const httpRequest = this.requestConfig(
       pathName,
       "PUT",
@@ -66,7 +68,18 @@ class HttpServiceRepository {
       requestParams
     );
 
-    return await this.queryManager.execute(httpRequest);
+    return this.queryManager.execute(httpRequest);
+  }
+
+  async httpDeleteRequest({ headers = {}, pathName = "/", requestParams = {} }) {
+    const httpRequest = this.requestConfig(
+      pathName,
+      "DELETE",
+      headers,
+      requestParams
+    );
+
+    return this.queryManager.execute(httpRequest);
   }
 }
 
