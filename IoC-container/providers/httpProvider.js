@@ -52,7 +52,7 @@ const awsClient = (uri, options) => {
   }
 
   if (isEmpty(requestPayload)) {
-    throw new Error("")
+    throw new Error("no valid http request object");
   }
 
   AWS4.sign(

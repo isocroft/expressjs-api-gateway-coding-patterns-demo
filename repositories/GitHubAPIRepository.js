@@ -1,6 +1,6 @@
 const HttpServiceRepository = require("./HttpServiceRepository");
 
-/* @HINT: This is the user data repository class. */
+/* @HINT: This is the github (third-party) api repository class. */
 
 class GitHubAPIRepository extends HttpServiceRepository {
   constructor (queryTaskHandlers, lruCache) {
@@ -32,7 +32,11 @@ class GitHubAPIRepository extends HttpServiceRepository {
       requestParams
     )
 
-    return Object.assign({}, { timeout: 1500, cache: this.cache }, $config)
+    return Object.assign(
+      {},
+      { timeout: 1500, cache: this.cache },
+      $config
+    );
   }
 
   async getAllNotifications (pollingInterval = 60) {

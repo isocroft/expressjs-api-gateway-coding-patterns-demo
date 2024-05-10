@@ -1,5 +1,6 @@
 const StorageQueryTaskHandler = require("./StorageQueryTaskHandler");
 const url = require('url');
+
 const { camelCaseify } = require("../helpers");
 
 /* @HINT: This is a graphql service query task handler for a GraphQL API server. */
@@ -54,6 +55,7 @@ class GraphQLServiceQueryTaskHandler extends StorageQueryTaskHandler {
       result = await this.graphQlClient[type](url, query, builderOrRequest)
       return result
     } catch (error) {
+      /* @HINT: re-throw the error using `error.message` */
       this.skipHandlerProcessingWithCustomMessage(error.message)
     }
   }
@@ -62,7 +64,7 @@ class GraphQLServiceQueryTaskHandler extends StorageQueryTaskHandler {
     let type =  "query"
     let operationName = "_"
 
-    /* @HINT: transform request object meant for a rest service to a graph ql service payload object. */
+    /* @HINT: transform request object meant for a rest service to a graph ql service payload object */
     if (typeof builderOrRequest.url === "string"
       && !builderOrRequest.url.endsWith(this.graphQlServicePathname)) {
       const { host, pathname } =  typeof url['parse'] === "function"
@@ -82,7 +84,7 @@ class GraphQLServiceQueryTaskHandler extends StorageQueryTaskHandler {
       delete builderOrRequest.method;
     }
 
-
+    /* @TODO: add `variable` and `args` to `operation` object the JSON-query object for proper GraphQL types */
     builderOrRequest[type] = {
       operation: {
         name: operationName,
