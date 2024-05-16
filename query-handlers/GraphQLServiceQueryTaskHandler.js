@@ -34,8 +34,9 @@ class GraphQLServiceQueryTaskHandler extends StorageQueryTaskHandler {
     let canProceedWithProcessing = false;
 
     /* @HINT: Check if variable `builderOrRequest` is a knex query builder instance */
-    if (typeof builderOrRequest.url === "string"
-      && builderOrRequest.url.endsWith(this.graphQlServicePathname)) {
+    if (builderOrRequest instanceof Object
+      && typeof builderOrRequest.url === "string"
+        && builderOrRequest.url.endsWith(this.graphQlServicePathname)) {
       canProceedWithProcessing = true;
     }
 
@@ -71,7 +72,7 @@ class GraphQLServiceQueryTaskHandler extends StorageQueryTaskHandler {
       ? url.parse(uri)
       : new url.URL(uri);
 
-      operationName = camelCaseify(pathname, '/')
+      operationName = camelCaseify(pathname)
       builderOrRequest.url = `${host}${this.graphQlServicePathname}`;
     }
 
