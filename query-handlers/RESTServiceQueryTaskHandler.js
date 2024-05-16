@@ -13,16 +13,17 @@ class RESTServiceQueryTaskHandler extends StorageQueryTaskHandler {
     let canProceedWithProcessing = false;
     let result = null;
 
-    if (typeof builderOrRequest.url === "string"
-        && typeof builderOrRequest.method === "string"
-         && [
-           "get",
-           "post",
-           "patch",
-           "delete",
-           "head",
-           "put"
-         ].includes(builderOrRequest.method.toLowerCase())) {
+    if (builderOrRequest instanceof Object
+        && typeof builderOrRequest.url === "string"
+          && typeof builderOrRequest.method === "string"
+           && [
+             "get",
+             "post",
+             "patch",
+             "delete",
+             "head",
+             "put"
+           ].includes(builderOrRequest.method.toLowerCase())) {
       canProceedWithProcessing = true;
     }
 
