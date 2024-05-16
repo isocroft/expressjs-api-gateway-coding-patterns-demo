@@ -3,9 +3,9 @@ const HttpServiceRepository = require("./HttpServiceRepository");
 /* @HINT: This is the github (third-party) api repository class. */
 
 class GitHubAPIRepository extends HttpServiceRepository {
-  constructor (queryTaskHandlers, lruCache) {
+  constructor (queryTaskHandlers, httpLRUCache) {
     super(queryTaskHandlers)
-    this.cache = lruCache
+    this.httpCache = httpLRUCache
   }
 
   get apiVersion () {
@@ -34,7 +34,7 @@ class GitHubAPIRepository extends HttpServiceRepository {
 
     return Object.assign(
       {},
-      { timeout: 1500, cache: this.cache },
+      { timeout: this.httpTimeout, cache: this.httpCache },
       $config
     );
   }
