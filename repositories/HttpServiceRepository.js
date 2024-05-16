@@ -8,18 +8,30 @@ class HttpServiceRepository {
     /* @NOTE: <COMPOSITION> | Composition can also lead to tight coupling! */
     /* @NOTE: Tight coupling here: will allow temporarily */
     this.queryManager = new StorageQueryHandlersManager(queryHandlers);
+    this.timeoutInMilliSeconds = 1500;
   }
 
   set newRootHandler(rootHandler) {
     this.queryManager.swapRootHandler(rootHandler);
   }
 
+  get httpTimeout () {
+    return this.timeoutInMilliSeconds
+  }
+
   get apiVersion () {
     throw new Error("api version not set")
   }
 
-  baseURL() {
-    throw new Error("base URL string is not available from abstract class");
+  set httpTimeout (newHttpTimeout = 0) {
+    if (typeof newHttpTimeout === "number"
+        && !Number.isNaN(newHttpTimeout)) {
+      this.timeoutInMilliSeconds = newHttpTimeout
+    }
+  }
+
+  baseURL(pathName =  "/") {
+    throw new Error(`base URL string with ${pathName} is not available from abstract class`);
   }
 
   requestConfig(
