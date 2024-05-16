@@ -55,7 +55,7 @@ class DatabaseTableRepository {
       columnsToFetch = ["*"];
     }
 
-    return await this.queryManager.execute(
+    return this.queryManager.execute(
       addWhereClauses(queryBuilder, whereClausesCallback)
         .select(...columnsToFetch)
         .clone()
@@ -79,7 +79,7 @@ class DatabaseTableRepository {
       columnsToFetch = ["*"];
     }
 
-    return await this.queryManager.execute(
+    return this.queryManager.execute(
       addWhereClauses(queryBuilder, whereClausesCallback)
         .update(rowsToUpdate, columnsToFetch)
         .clone()
@@ -90,7 +90,7 @@ class DatabaseTableRepository {
     /* @CHECK: https://github.com/knex/knex/issues/3018#issuecomment-458781094/ */
     const queryBuilder = this.queryBuilder;
 
-    return await this.queryManager.execute(queryBuilder.first().clone());
+    return this.queryManager.execute(queryBuilder.first().clone());
   }
 
   async fetchFirstWhere(whereClausesCallback = undefined) {
@@ -98,7 +98,7 @@ class DatabaseTableRepository {
     const queryBuilder = this.queryBuilder;
     const { addWhereClauses } = this;
 
-    return await this.queryManager.execute(
+    return this.queryManager.execute(
       addWhereClauses(queryBuilder, whereClausesCallback).first().clone()
     );
   }
@@ -112,7 +112,7 @@ class DatabaseTableRepository {
     const queryBuilder = this.queryBuilder;
     const { merge, whenConflict } = this;
 
-    return await this.queryManager.execute(
+    return this.queryManager.execute(
       merge(
         whenConflict(
           queryBuilder.insert(
