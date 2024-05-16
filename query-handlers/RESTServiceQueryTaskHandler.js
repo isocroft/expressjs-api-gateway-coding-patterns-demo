@@ -13,7 +13,16 @@ class RESTServiceQueryTaskHandler extends StorageQueryTaskHandler {
     let canProceedWithProcessing = false;
     let result = null;
 
-    if (typeof builderOrRequest.url === "string" && !builderOrRequest.url.endsWith("/graphql")) {
+    if (typeof builderOrRequest.url === "string"
+        && typeof builderOrRequest.method === "string"
+         && [
+           "get",
+           "post",
+           "patch",
+           "delete",
+           "head",
+           "put"
+         ].includes(builderOrRequest.method.toLowerCase())) {
       canProceedWithProcessing = true;
     }
 
@@ -35,7 +44,9 @@ class RESTServiceQueryTaskHandler extends StorageQueryTaskHandler {
             `server "${error.url}" request encountered a service error; reason: ${error.statusMessage}`
           );
         }
-        throw new Error(`http request to ${error.url} failed; reason: ${error.message}`)
+        return this.skipHandlerProcessingWithCustomMessage(
+          `http request to ${error.url} failed; reason: ${error.message}`
+        );
       } else if (error instanceof RequestError) {
         if (error.code === 'ETIMEDOUT'
           || error.code === 'ECONNREFUSED'
@@ -44,23 +55,23 @@ class RESTServiceQueryTaskHandler extends StorageQueryTaskHandler {
           /* @HINT: This REST API server is down, trigger the next handler to run */
           return this.skipHandlerProcessing();
         }
-        throw new Error(`http request to ${error.url} failed; reason: ${error.message}`)
+        return this.skipHandlerProcessingWithCustomMessage(
+          `http request to ${error.url} failed; reason: ${error.message}`
+        );
       } else if (error instanceof CancelError) {
         return this.skipHandlerProcessingWithCustomMessage(
           `server "${error.url}" request was cancelled`
         );
       }
-    }
-
-    
+    }    
   }
 
-  async finalizeProcessing() {
-    console.log("e don finish rest service request ooo");
+  async finalizeProcessing(builderOrRequest) {
+    console.log(`e don finish rest service request ooo; for ${builderOrRequest.url}`);
   }
 
-  async finalizeProcessingWithError() {
-    console.error("e don finish rest service request with error ooo");
+  async finalizeProcessingWithError(builderOrRequest, error) {
+    console.error(`e don finish rest service request with error: ${error} for ${builderOrRequest.url}`);
   }
 }
 
