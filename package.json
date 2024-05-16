@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "A DEMO with Express.js showing implementation of a cache, database and graphql query handlers for a data repository using 3 coding patterns \n\n- chain-of-responsibility pattern\n- decorator pattern\n- repository pattern",
   "main": "app.js",
+  "private": true,
   "scripts": {
     "start": "nodemon app.js localhost 8080"
   },
@@ -14,7 +15,7 @@
     "dotenv": "8.2.0",
     "express": "~4.16.1",
     "got": "8.3.2",
-    "gotql": "1.4.1",
+    "gotql": "1.0.0",
     "knex": "0.21.1",
     "morgan": "~1.9.1",
     "pg": "8.10.0",
