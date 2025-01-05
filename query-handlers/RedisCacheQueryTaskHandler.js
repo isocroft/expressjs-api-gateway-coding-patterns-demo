@@ -15,23 +15,42 @@ class RedisCacheQueryTaskHandler extends StorageQueryTaskHandler {
     this.cache = cacheContainer;
   }
 
-  async canQuery(queryKey) {
+  async canQuery (queryKey) {
     return this.cache.hasKey(queryKey);
   }
 
-  async beginProcessing(builderOrRequest) {
+  async beginProcessing (builderOrRequest) {
     let canProceedWithProcessing = false;
+    let isSQLDatabaseQueryTask = false;
 
-    /* @HINT: Check if variable `builderOrRequest` is a knex query builder instance */
+    /* @HINT: Check if variable `builderOrRequest` is a knex query builder object */
     if (typeof builderOrRequest.toSQL === "function") {
       /* @CHECK: https://github.com/knex/knex/issues/3018#issuecomment-458781094/ */
       const query = builderOrRequest.toSQL();
-      canProceedWithProcessing = query.sql.toLowerCase().startsWith("select");
-    } else {
-      canProceedWithProcessing = !(builderOrRequest.headers instanceof Object
-        && builderOrRequest.headers['content-type'] === "application/graphql")
-        || (typeof builderOrRequest.url === "string"
-            && builderOrRequest.url.endsWith("/graphql"));
+      canProceedWithProcessing = query.sql.toLowerCase().startsWith("select")
+        && !query.sql.toLowerCase().includes("join");
+      isSQLDatabaseQueryTask = true
+    } 
+    /* @HINT: Check if the variable `builderOrRequest` is a http (graphql) request config object */
+    else if (typeof builderOrRequest.url === "string"
+      && !builderOrRequest.url.endsWith("/graphql")) {
+      const hasHeaders = builderOrRequest.headers instanceof Object;
+      const headers = builderOrRequest.headers; 
+      const method = builderOrRequest.method.toLowerCase();
+      
+      /*  @HINT: This redis cache query task handler will not handle graphql query tasks */
+      canProceedWithProcessing = !(hasHeaders
+        && headers['content-type'] === "application/graphql")
+        || !(method === "post"
+            && typeof builderOrRequest.body === "string"
+              && headers['content-type'] === "application/json"
+              && /([\s]*){([\s]*)"([\s]*)query([\s]*)"([\s]*)\:([\s]*)"([\s]*){/m.test(
+                builderOrRequest.body.toLowerCase()
+              )
+           ) || !(method === "get"
+                  && typeof builderOrRequest.query === "string"
+                    && builderOrRequest.query.includes("query={")
+                );
     }
 
     await this.cache.establishConnectionWithRedisServer({
@@ -42,7 +61,11 @@ class RedisCacheQueryTaskHandler extends StorageQueryTaskHandler {
       return this.skipHandlerProcessing();
     }
 
-    const queryHash = murmurHash(builderOrRequest.toSQL().sql);
+    const queryHash = murmurHash(
+      isSQLDatabaseQueryTask
+        ? builderOrRequest.toSQL().sql
+        : `${builderOrRequest.method.toLowerCase()}-${builderOrRequest.url}`
+    );
     const isCacheHit = await this.canQuery(queryHash);
 
     if (isCacheHit) {
@@ -52,22 +75,45 @@ class RedisCacheQueryTaskHandler extends StorageQueryTaskHandler {
 
   async finalizeProcessing(builderOrRequest, result) {
     let canProceedWithProcessing = false;
+    let isSQLDatabaseQueryTask = false;
 
-    /* @HINT: Check if variable `builderOrRequest` is a knex query builder instance */
+    /* @HINT: Check if variable `builderOrRequest` is a knex query builder object */
     if (typeof builderOrRequest.toSQL === "function") {
       /* @CHECK: https://github.com/knex/knex/issues/3018#issuecomment-458781094/ */
       const query = builderOrRequest.toSQL();
-      canProceedWithProcessing = query.sql.toLowerCase().startsWith("select");
-    } else {
-      canProceedWithProcessing = !(builderOrRequest.headers instanceof Object
-        && builderOrRequest.headers['content-type'] === "application/graphql")
-        || (typeof builderOrRequest.url === "string"
-            && builderOrRequest.url.endsWith("/graphql"));
+      canProceedWithProcessing = query.sql.toLowerCase().startsWith("select")
+        && !query.sql.toLowerCase().includes("join");
+      isSQLDatabaseQueryTask = true
+    } 
+    /* @HINT: Check if the variable `builderOrRequest` is a http (graphql) request config object */
+    else if (typeof builderOrRequest.url === "string"
+      && !builderOrRequest.url.endsWith("/graphql")) {
+      const hasHeaders = builderOrRequest.headers instanceof Object;
+      const headers = builderOrRequest.headers; 
+      const method = builderOrRequest.method.toLowerCase();
+      
+      /*  @HINT: This redis cache query task handler will not handle graphql query tasks */
+      canProceedWithProcessing = !(hasHeaders
+        && headers['content-type'] === "application/graphql")
+        || !(method === "post"
+            && typeof builderOrRequest.body === "string"
+              && headers['content-type'] === "application/json"
+              && /([\s]*){([\s]*)"([\s]*)query([\s]*)"([\s]*)\:([\s]*)"([\s]*){/m.test(
+                builderOrRequest.body.toLowerCase()
+              )
+           ) || !(method === "get"
+                  && typeof builderOrRequest.query === "string"
+                    && builderOrRequest.query.includes("query={")
+                );
     }
 
     if (canProceedWithProcessing) {
-      const queryHash = murmurHash(builderOrRequest.toSQL().sql);
-      const isCacheMiss = await !this.canQuery(queryHash);
+      const queryHash = murmurHash(
+        isSQLDatabaseQueryTask
+        ? builderOrRequest.toSQL().sql
+        : `${builderOrRequest.method.toLowerCase()}-${builderOrRequest.url}`
+      );
+      const isCacheMiss = !(await this.canQuery(queryHash));
 
       if (isCacheMiss) {
         await this.cache.set(queryHash, result);
