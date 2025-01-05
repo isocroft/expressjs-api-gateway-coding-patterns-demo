@@ -1,6 +1,8 @@
 const StorageQueryTaskHandler = require("./StorageQueryTaskHandler");
 
-/* @HINT: This is a file system query task handler for a REST API server. */
+const { isEmpty } = require("../helpers");
+
+/* @HINT: This is a file system query task handler for any file system and files/folders. */
 class FileSystemQueryTaskHandler extends StorageQueryTaskHandler {
   constructor(fileClient, contextTransformMap = {}) {
     super(
