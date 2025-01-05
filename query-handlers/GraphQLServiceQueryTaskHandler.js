@@ -65,6 +65,11 @@ class GraphQLServiceQueryTaskHandler extends StorageQueryTaskHandler {
     let type =  "query"
     let operationName = "_"
 
+    if (builderOrRequest['query'] instanceof Object
+      || builderOrRequest['mutation'] instanceof Object) {
+      return builderOrRequest;
+    }
+
     /* @HINT: transform request object meant for a rest service to a graph ql service payload object */
     if (typeof builderOrRequest.url === "string"
       && !builderOrRequest.url.endsWith(this.graphQlServicePathname)) {
