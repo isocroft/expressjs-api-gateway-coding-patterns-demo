@@ -54,8 +54,8 @@ class StorageQueryTaskHandler {
     throw new Error(message);
   }
 
-  async alternateProcessing (initialProcessingError) {
-    throw initialProcessingError;
+  async alternateProcessing () {
+    return null;
   }
 
   async finalizeProcessing() {
@@ -113,9 +113,8 @@ class StorageQueryTaskHandler {
           await this.finalizeProcessingWithError(builderOrRequest, processingError);
           if (noResult) {
             /* @HINT: If there's no result and we have an error, try to get a result from an alternate process */
-            if (processingError !== null) {
+            if (processingError.message === this.message) {
               result = await this.alternateProcessing(
-                processingError,
                 this.migrateContext(builderOrRequest)
               );
               noResult = false;
