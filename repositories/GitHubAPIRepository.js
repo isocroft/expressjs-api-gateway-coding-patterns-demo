@@ -3,7 +3,7 @@ const HttpServiceRepository = require("./HttpServiceRepository");
 /* @HINT: This is the github (third-party) api repository class. */
 
 class GitHubAPIRepository extends HttpServiceRepository {
-  constructor (queryTaskHandlers, httpLRUCache) {
+  constructor (queryTaskHandlers, httpLRUCache = null) {
     super(queryTaskHandlers)
     this.httpCache = httpLRUCache
   }
