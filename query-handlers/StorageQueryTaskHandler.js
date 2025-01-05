@@ -16,9 +16,10 @@
     - skipHandlerProcessingWithCustomMessage(...);
     - handle(...);
 
-    This abstract class will have 1 protected method
+    This abstract class will have 2 protected methods
 
     - migrateContext(...);
+    - alternateProcessing(...);
 */
 
 /* @HINT: This is the query task handler base/parent class. */
@@ -53,6 +54,10 @@ class StorageQueryTaskHandler {
     throw new Error(message);
   }
 
+  async alternateProcessing (builderOrRequest) {
+    return null;
+  }
+
   async finalizeProcessing() {
     throw new Error(
       "Implementation needed for [protected] [abstract] method {async} `finalizeProcessing()`. \r\n\r\n" +
@@ -71,35 +76,56 @@ class StorageQueryTaskHandler {
     return builderOrRequest;
   }
 
-  async handle(builderOrRequest) {
+  async handle (builderOrRequest) {
     let result = null;
     let processingError = null;
+    let noResult = true;
     let hasError = false;
 
     try {
-      result = await this.beginProcessing(builderOrRequest);
-      return result;
-    } catch (error) {
-      if (error instanceof Error) {
-        if (error.message === this.message) {
-          if (this.nextHandler !== null) {
+      try {
+        result = await this.beginProcessing(
+          builderOrRequest
+        );
+        noResult = false;
+        return result;
+      } catch (error) {
+        if (!(error instanceof Error)) {
+          throw error
+        }
+
+        if (error.message === this.message
+          && this.nextHandler !== null) {
             result = await this.nextHandler.handle(
               this.nextHandler.migrateContext(builderOrRequest)
             );
-          }
+            noResult = false;
+            return result;
         } else {
           hasError = true;
           processingError = error;
           throw error;
         }
+      } finally {
+        if (!hasError) {
+          await this.finalizeProcessing(builderOrRequest, result);
+        } else {
+          await this.finalizeProcessingWithError(builderOrRequest, processingError);
+          if (noResult) {
+            /* @HINT: If there's no result and we have an error, try to get a result from an alternate process */
+            result = await this.alternateProcessing(
+              this.migrateContext(builderOrRequest)
+            );
+            noResult = false;
+            return result
+          }
+        }
       }
-    } finally {
-      if (!hasError) {
-        await this.finalizeProcessing(builderOrRequest, result);
-      } else {
-        await this.finalizeProcessingWithError(builderOrRequest, processingError)
-      }
+    } catch ($error) {
+      throw $error;
     }
+
+    return result;
   }
 }
 
