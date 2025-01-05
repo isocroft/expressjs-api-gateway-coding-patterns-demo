@@ -25,7 +25,9 @@ class StorageQueryHandlersManager {
   }
 
   async execute(queryObject) {
-    return this.rootTaskHandler.handle(queryObject);
+    return this.rootTaskHandler.handle(
+      this.rootTaskHandler.migrateContext(queryObject)
+    );
   }
 
   swapRootHandler(newRootTaskHandler) {
