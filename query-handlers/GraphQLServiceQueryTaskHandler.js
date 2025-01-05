@@ -5,12 +5,12 @@ const { camelCaseify } = require("../helpers");
 
 /* @HINT: This is a graphql service query task handler for a GraphQL API server. */
 class GraphQLServiceQueryTaskHandler extends StorageQueryTaskHandler {
-  constructor(graphQlClient) {
+  constructor(graphQlClient, operationNameToFieldsNameMap = { '_': [] }) {
     super("graphql service handler execution declined");
     this.httpClient = graphQlClient;
 
     this.pathname = "/graphql"
-    this.operationNamesMap = { '_': [] }
+    this.operationNamesMap = operationNameToFieldsNameMap;
   }
 
   set updateGraphQlServicePathname (newPathname = "/") {
