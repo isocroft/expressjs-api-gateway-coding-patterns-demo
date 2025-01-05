@@ -32,10 +32,14 @@ class PostgreSQLDatabaseQueryTaskHandler extends StorageQueryTaskHandler {
       return this.skipHandlerProcessing();
     }
 
-    this.databaseConnection = await this.database.client.acquireConnection();
-    this.databaseConnection.query('SET timezone="UTC";');
+    try {
+      this.databaseConnection = await this.database.client.acquireConnection();
+      this.databaseConnection.query('SET timezone="UTC";');
+    } catch {
+      this.skipHandlerProcessing();
+    }
 
-    /* @HINT: Setup a database query timeout */
+    /* @HINT: Setup a database query timeout via the knex query builder instance */
     builderOrRequest.timeout(5500, {
       cancel: true
     });
