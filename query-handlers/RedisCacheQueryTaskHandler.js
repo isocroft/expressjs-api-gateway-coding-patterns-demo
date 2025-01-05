@@ -53,13 +53,13 @@ class RedisCacheQueryTaskHandler extends StorageQueryTaskHandler {
                 );
     }
 
-    await this.cache.establishConnectionWithRedisServer({
-      timeoutInMilliSeconds: 1200
-    });
-
     if (!canProceedWithProcessing) {
       return this.skipHandlerProcessing();
     }
+
+    await this.cache.establishConnectionWithRedisServer({
+      timeoutInMilliSeconds: 1200
+    });
 
     const queryHash = murmurHash(
       isSQLDatabaseQueryTask
@@ -71,6 +71,8 @@ class RedisCacheQueryTaskHandler extends StorageQueryTaskHandler {
     if (isCacheHit) {
       return await this.cache.get(queryHash);
     }
+
+    return this.skipHandlerProcessing();
   }
 
   async finalizeProcessing(builderOrRequest, result) {
