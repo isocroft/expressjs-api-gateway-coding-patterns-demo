@@ -13,8 +13,7 @@ class StorageQueryHandlersManager {
       const previousQueryTaskHandler = storageQueryHandlers[count];
       const nextQueryTaskHandler = storageQueryHandlers[count + 1];
 
-      if (previousQueryTaskHandler instanceof StorageQueryTaskHandler
-        && nextQueryTaskHandler instanceof StorageQueryTaskHandler) {
+      if (previousQueryTaskHandler instanceof StorageQueryTaskHandler) {
         previousQueryTaskHandler.setNextHandler(nextQueryTaskHandler);
       }
     }
@@ -32,18 +31,15 @@ class StorageQueryHandlersManager {
 
   swapRootHandler(newRootTaskHandler) {
     if (!(newRootTaskHandler instanceof StorageQueryTaskHandler)) {
-      console.error(
+      throw new Error(
         "Cannot proceed: root handler not swapable as object provided isn't a handler"
       );
-      return false;
     }
 
     const formerRootTaskHandler = this.rootTaskHandler;
 
     this.rootTaskHandler = newRootTaskHandler;
     this.rootTaskHandler.setNextHandler(formerRootTaskHandler);
-
-    return true;
   }
 }
 
