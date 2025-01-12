@@ -8,6 +8,7 @@ class DatabaseTableRepository {
   constructor(queryHandlers = []) {
     /* @NOTE: <COMPOSITION> | Composition can also lead to tight coupling! */
     /* @NOTE: Tight coupling (and tight cohesion) here: will allow temporarily */
+    /* @INFO: `StorageQueryHandlersManager` is a concrete class so we  don't extend it, we compose around it */
     this.queryManager = new StorageQueryHandlersManager(queryHandlers);
   }
 
