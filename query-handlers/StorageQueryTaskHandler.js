@@ -2,7 +2,7 @@
 
 /* @NOTE: This base class implements the Chain-Of-Responsibility coding pattern for data query tasks */
 
-/* @NOTE:
+/* @INFO:
     In a language like PHP or Java, this class will be an abstract class with 4 protected and abstract methods:
 
     - beginProcessing(...);
@@ -29,6 +29,7 @@
 
 class StorageQueryTaskHandler {
   constructor(skipHandlerErrorMessage = "") {
+    /* @INFO 2 protected member variables */
     this.message = skipHandlerErrorMessage;
     this.nextHandler = null;
   }
@@ -36,6 +37,7 @@ class StorageQueryTaskHandler {
   setNextHandler(handler) {
     if (handler instanceof StorageQueryTaskHandler) {
       this.nextHandler = handler;
+      return;
     }
     throw new Error(
       "Cannot set next handler as object provided is not a hanlder"
@@ -49,7 +51,13 @@ class StorageQueryTaskHandler {
     );
   }
 
-  skipHandlerProcessing() {
+  skipHandlerProcessing(error) {
+    if (this.nextHandler === null) {
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw "Unknown error";
+    }
     throw new Error(this.message);
   }
 
