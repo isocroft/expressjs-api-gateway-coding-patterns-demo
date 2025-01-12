@@ -10,12 +10,15 @@
     - finalizeProcessingWithError(...);
     - alternateProcessing(...);
 
-    This abstract class will also have 4 public and final methods:
+    This abstract class will also have 2 public and final methods:
 
-    - setNextHandler(...);
     - skipHandlerProcessing();
     - skipHandlerProcessingWithCustomMessage(...);
+
+    This abstract class will also have 2 protected and final methods:
+
     - handle(...);
+    - setNextHandler(...);
 
     This abstract class will have 1 protected method
 
