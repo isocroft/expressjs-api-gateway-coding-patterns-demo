@@ -35,8 +35,8 @@ class PostgreSQLDatabaseQueryTaskHandler extends StorageQueryTaskHandler {
     try {
       this.databaseConnection = await this.database.client.acquireConnection();
       this.databaseConnection.query('SET timezone="UTC";');
-    } catch {
-      return this.skipHandlerProcessing();
+    } catch (error) {
+      return this.skipHandlerProcessing(error);
     }
 
     /* @HINT: Setup a database query timeout via the knex query builder instance */
@@ -47,11 +47,15 @@ class PostgreSQLDatabaseQueryTaskHandler extends StorageQueryTaskHandler {
     /* @HINT: database query result initialization */
     let queryResult = null;
 
-    /* @HINT: Setup database transaction for database query */
-    await this.database.transaction(async (transaction) => {
-      /* @CHECK: https://github.com/knex/knex/issues/3018#issuecomment-458781094/ */
-      queryResult = await builderOrRequest.transacting(transaction);
-    });
+    try {
+      /* @HINT: Setup database transaction for database query */
+      await this.database.transaction(async (transaction) => {
+        /* @CHECK: https://github.com/knex/knex/issues/3018#issuecomment-458781094/ */
+        queryResult = await builderOrRequest.transacting(transaction);
+      });
+    } catch (error) {
+      return this.skipHandlerProcessing(error);
+    }
 
     return queryResult;
   }
