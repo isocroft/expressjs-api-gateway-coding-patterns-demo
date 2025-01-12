@@ -57,9 +57,13 @@ class RedisCacheQueryTaskHandler extends StorageQueryTaskHandler {
       return this.skipHandlerProcessing();
     }
 
-    await this.cache.establishConnectionWithRedisServer({
-      timeoutInMilliSeconds: 1200
-    });
+    try {
+      await this.cache.establishConnectionWithRedisServer({
+        timeoutInMilliSeconds: 1200
+      });
+    } catch {
+      return this.skipHandlerProcessing();
+    }
 
     const queryHash = murmurHash(
       isSQLDatabaseQueryTask
