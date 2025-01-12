@@ -3,11 +3,12 @@
 /* @NOTE: This base class implements the Chain-Of-Responsibility coding pattern for data query tasks */
 
 /* @NOTE:
-    In a language like PHP or Java, this class will be an abstract class with 3 protected and abstract methods:
+    In a language like PHP or Java, this class will be an abstract class with 4 private and abstract methods:
 
     - beginProcessing(...);
     - finalizeProcessing(...);
     - finalizeProcessingWithError(...);
+    - alternateProcessing(...);
 
     This abstract class will also have 4 public and final methods:
 
@@ -16,10 +17,9 @@
     - skipHandlerProcessingWithCustomMessage(...);
     - handle(...);
 
-    This abstract class will have 2 protected methods
+    This abstract class will have 1 protected method
 
     - migrateContext(...);
-    - alternateProcessing(...);
 */
 
 /* @HINT: This is the query task handler base/parent class. */
