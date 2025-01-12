@@ -12,7 +12,7 @@
 
     This abstract class will also have 2 protected and final methods:
 
-    - skipHandlerProcessing();
+    - skipHandlerProcessing(...);
     - skipHandlerProcessingWithCustomMessage(...);
 
     This abstract class will also have 2 public and final methods:
