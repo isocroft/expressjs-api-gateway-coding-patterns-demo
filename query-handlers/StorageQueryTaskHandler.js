@@ -10,19 +10,19 @@
     - finalizeProcessingWithError(...);
     - alternateProcessing(...);
 
-    This abstract class will also have 2 protected and final methods:
+    This abstract class will also have 1 protected and final method:
 
     - skipHandlerProcessing(...);
-    - skipHandlerProcessingWithCustomMessage(...);
 
     This abstract class will also have 2 public and final methods:
 
     - handle(...);
     - setNextHandler(...);
 
-    This abstract class will have 1 public method
+    This abstract class will have 2 protected methods
 
     - migrateContext(...);
+    - skipHandlerProcessingWithCustomMessage(...);
 */
 
 /* @HINT: This is the query task handler base/parent class. */
@@ -66,7 +66,10 @@ class StorageQueryTaskHandler {
   }
 
   async alternateProcessing () {
-    return null;
+    throw new Error(
+      "Implementation needed for [protected] [abstract] method {async} `finalizeProcessing()`. \r\n\r\n" +
+        " > This interface is not available from abstract class."
+    );
   }
 
   async finalizeProcessing() {
@@ -96,7 +99,7 @@ class StorageQueryTaskHandler {
     try {
       try {
         result = await this.beginProcessing(
-          builderOrRequest
+          this.migrateContext(builderOrRequest)
         );
         noResult = false;
         return result;
@@ -108,7 +111,7 @@ class StorageQueryTaskHandler {
         if (error.message === this.message
           && this.nextHandler !== null) {
             result = await this.nextHandler.handle(
-              this.nextHandler.migrateContext(builderOrRequest)
+              builderOrRequest
             );
             noResult = false;
             return result;
@@ -119,7 +122,7 @@ class StorageQueryTaskHandler {
         }
       } finally {
         if (!hasError) {
-          await this.finalizeProcessing(builderOrRequest, result);
+          await this.finalizeProcessing(this.migrateContext(builderOrRequest), result);
         } else {
           await this.finalizeProcessingWithError(builderOrRequest, processingError);
           if (noResult) {
