@@ -15,6 +15,8 @@ class StorageQueryHandlersManager {
 
       if (previousQueryTaskHandler instanceof StorageQueryTaskHandler) {
         previousQueryTaskHandler.setNextHandler(nextQueryTaskHandler);
+      } else {
+        continue;
       }
     }
 
