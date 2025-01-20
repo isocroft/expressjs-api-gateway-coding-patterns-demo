@@ -21,7 +21,7 @@
 
     This abstract class will have 2 protected methods
 
-    - migrateContext(...);
+    - migrateQueryTask(...);
     - skipHandlerProcessingWithCustomMessage(...);
 */
 
@@ -29,7 +29,7 @@
 
 class StorageQueryTaskHandler {
   constructor(skipHandlerErrorMessage = "") {
-    /* @INFO 2 protected member variables */
+    /* @INFO 2 private member variables */
     this.message = skipHandlerErrorMessage;
     this.nextHandler = null;
   }
@@ -53,10 +53,7 @@ class StorageQueryTaskHandler {
 
   skipHandlerProcessing(error) {
     if (this.nextHandler === null) {
-      if (error instanceof Error) {
-        throw error;
-      }
-      throw "Unknown error";
+      throw error;
     }
     throw new Error(this.message);
   }
@@ -86,7 +83,7 @@ class StorageQueryTaskHandler {
     );
   }
 
-  migrateContext (builderOrRequest) {
+  migrateQueryTask (builderOrRequest) {
     return builderOrRequest;
   }
 
@@ -99,7 +96,7 @@ class StorageQueryTaskHandler {
     try {
       try {
         result = await this.beginProcessing(
-          this.migrateContext(builderOrRequest)
+          this.migrateQueryTask(builderOrRequest)
         );
         noResult = false;
         return result;
@@ -122,14 +119,14 @@ class StorageQueryTaskHandler {
         }
       } finally {
         if (!hasError) {
-          await this.finalizeProcessing(this.migrateContext(builderOrRequest), result);
+          await this.finalizeProcessing(this.migrateQueryTask(builderOrRequest), result);
         } else {
           await this.finalizeProcessingWithError(builderOrRequest, processingError);
           if (noResult) {
             /* @HINT: If there's no result and we have an error, try to get a result from an alternate process */
             if (processingError.message === this.message) {
               result = await this.alternateProcessing(
-                this.migrateContext(builderOrRequest)
+                this.migrateQueryTask(builderOrRequest)
               );
               noResult = false;
               return result;
